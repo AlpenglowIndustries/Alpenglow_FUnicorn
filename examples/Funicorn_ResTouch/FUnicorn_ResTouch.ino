@@ -1,26 +1,24 @@
 
 #include "FUnicorn.h"
-#include <ADCTouch.h>
 
-#define CAP_BUTT_PRESS 60
-
-int ref0;
+#define RES_BUTT_PRESS 1015 // upper threshold for a valid resistive touch "button" press
 
 void setup() {
 
   initFUnicorn();
-
-  ref0 = ADCTouch.read(A0, 500);    //create reference values to account for offset
+  Serial.begin(9600);
 }
 
 void loop() {
 
   static uint16_t counter = 0;
 
-  int touchValue = ADCTouch.read(A0);   //no second parameter defaults to 100 samples
-  touchValue -= ref0;                   //remove offset
+  int resButtValue = analogRead(A1);
 
-  if (touchValue > CAP_BUTT_PRESS) {
+  Serial.print("adc = ");
+  Serial.println(resButtValue);
+
+  if (resButtValue < RES_BUTT_PRESS) {
     switch (counter % 5) {
       case 0:
       blinkDemo();
@@ -40,4 +38,6 @@ void loop() {
     }
     counter++;
   }
+
+  delay(100);
 }
