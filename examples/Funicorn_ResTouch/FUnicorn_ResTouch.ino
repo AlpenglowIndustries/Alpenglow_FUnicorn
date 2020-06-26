@@ -6,7 +6,8 @@
 void setup() {
 
   initFUnicorn();
-  Serial.begin(9600);
+//  Serial.begin(9600);   // uncomment serial lines and look at output if having trouble triggering
+  startupHornBlink();
 }
 
 void loop() {
@@ -15,8 +16,8 @@ void loop() {
 
   int resButtValue = analogRead(A1);
 
-  Serial.print("adc = ");
-  Serial.println(resButtValue);
+//  Serial.print("adc = ");
+//  Serial.println(resButtValue);
 
   if (resButtValue < RES_BUTT_PRESS) {
     switch (counter % 5) {

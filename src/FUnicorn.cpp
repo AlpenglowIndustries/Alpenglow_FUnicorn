@@ -111,6 +111,22 @@ void gotoSleep(void) {
 // Examples of Blink Routines
 ///////////////////////////////////////////////////
 
+void startupHornBlink (void) {
+  uint8_t j;
+  for (j = 0; j < 255; j++) {
+    HORN_PWM = j;
+    delay(2);
+  }
+  HORN_PWM = ON;
+  delay(150);
+  for (j = 254; j < 255; j--) {
+    HORN_PWM = j;
+    delay(2);
+  }
+  HORN_PWM = OFF;
+  delay(150);
+}
+
 void blinkDemo (void) {
   BUTTLED_ON;
   delay(500);

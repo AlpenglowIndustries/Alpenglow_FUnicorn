@@ -37,6 +37,7 @@ void setup() {
   // initializes the button as an interrupt source, both wakes from sleep and triggers LEDs
   initButt();
   sei();
+  startupHornBlink();
 
 }
 

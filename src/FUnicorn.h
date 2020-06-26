@@ -73,6 +73,7 @@ void initFUnicorn (void);         // initializes all of the above
 void gotoSleep (void);
 
 // blink pattern functions
+void startupHornBlink (void);
 void blinkDemo (void);
 void blinkCrazy (void);
 void blinkYouFuck (void);
