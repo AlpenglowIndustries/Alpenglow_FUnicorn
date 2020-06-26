@@ -3,7 +3,7 @@
 #include <ADCTouch.h>
 
 #define CAP_BUTT_PRESS 50           // lower value is more senstive to touch, default = 50
-
+                                    // Different power supplies affect this, batteries need lower values
 int ref0;
 
 void setup() {
