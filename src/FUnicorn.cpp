@@ -23,6 +23,8 @@
 ///////////////////////////////////////////////////
 // Initialization Functions
 ///////////////////////////////////////////////////
+
+// sets all LEDs as outputs and OFF
 void initOutputs (void) {
   // sets the following to outputs
   PORTB = 0;
@@ -31,11 +33,13 @@ void initOutputs (void) {
   DDRB |= ((1 << BANG) | (1 << YOU) | (1 << HORN));
 }
 
+// sets up the external button as an interrupt
 void initButt (void) {
   EICRA |= (1 << ISC01);      // INT0 triggers on falling edge
   EIMSK |= (1 << INT0);       // enables INT0
 };
 
+// initializes PWM outputs on HORN and FUCK
 void initFuckHornTimer (void) {
   TCCR2A |= (1 << COM2A1) | (1 << COM2B1) | (1 << WGM20);   // Phase correct PWM, 0xFF is top, 8-bit
   OCR2A = 0;                  // should start as solid off
@@ -43,6 +47,7 @@ void initFuckHornTimer (void) {
   TCCR2B |= (1 << CS20);      // enables the clock with a prescaler of 1
 }
 
+// initializes PWM outputs on BAND and YOU
 void initBangYouTimer (void) {
   TCCR1A |= (1 << COM1A1) | (1 << COM1B1) | (1 << WGM10);   // Phase correct PWM, 0x00FF is top, 8-bit
   ATOMIC_BLOCK(ATOMIC_FORCEON){       // atomic operation for 16-bit register writes
