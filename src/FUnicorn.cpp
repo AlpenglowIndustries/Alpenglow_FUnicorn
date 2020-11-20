@@ -111,6 +111,7 @@ void gotoSleep(void) {
 // Examples of Blink Routines
 ///////////////////////////////////////////////////
 
+// pulses the Horn LED once
 void startupHornBlink (void) {
   uint8_t j;
   for (j = 0; j < 255; j++) {
@@ -127,10 +128,12 @@ void startupHornBlink (void) {
   delay(150);
 }
 
+// 4-part blink routine
 void blinkDemo (void) {
   BUTTLED_ON;
   delay(500);
 
+  // pulses FUCK to solid ON
   uint8_t i;
   for (i = 0; i < 255; i++) {
     FUCK_PWM = i;
@@ -139,6 +142,7 @@ void blinkDemo (void) {
   FUCK_PWM = ON;
   delay(500);
 
+  // pulses YOU to solid ON
   for (i = 0; i < 255; i++) {
     YOU_PWM = i;
     delay(3);
@@ -146,6 +150,7 @@ void blinkDemo (void) {
   YOU_PWM = ON;
   delay(500);
 
+  // flashes BANG on/off 10 times
   for (i = 0; i < 10; i++){
     BANG_PWM = ON;
     delay(100);
@@ -154,6 +159,7 @@ void blinkDemo (void) {
   }
   BANG_PWM = ON;
 
+  // pulses HORN on/off 2 times, ending with solid ON
   uint8_t j;
   for (i = 0; i < 2; i++) {
     for (j = 0; j < 255; j++) {
@@ -174,8 +180,11 @@ void blinkDemo (void) {
     delay(2);
   }
   HORN_PWM = ON;
+
+  // everthing is solid ON for 2 seconds
   delay(2000);
 
+  // turns all LEDs off
   FUCK_OFF;
   YOU_OFF;
   BANG_OFF;
@@ -183,6 +192,7 @@ void blinkDemo (void) {
   BUTTLED_OFF;
 }
 
+// slowly blinks "Fuck You, You Fuck !!!"
 void blinkYouFuck (void)
 {
   BUTTLED_ON;
@@ -218,6 +228,7 @@ void blinkYouFuck (void)
   BUTTLED_OFF;
 }
 
+// everything flashes super fast like crazy
 void blinkCrazy (void) {
 
   BUTTLED_ON;
@@ -241,9 +252,11 @@ void blinkCrazy (void) {
   BUTTLED_OFF;
 }
 
+//
 void blinkAllOn(void) {
   BUTTLED_ON;
 
+  // pulses all LEDs to solid ON
   uint8_t i;
   for (i = 0; i < 255; i++) {
     FUCK_PWM = i;
@@ -252,13 +265,15 @@ void blinkAllOn(void) {
     HORN_PWM = i;
     delay(3);
   }
+
+  // ensuring all LEDs are solid ON
   FUCK_ON;
   YOU_ON;
   BANG_ON;
   HORN_ON;
-
   delay(3000);
 
+  // pulses all LEDs to solid OFF
   for (i = 254; i < 255; i--) {
     FUCK_PWM = i;
     YOU_PWM = i;
@@ -274,6 +289,7 @@ void blinkAllOn(void) {
   BUTTLED_OFF;
 }
 
+// slowly blinks "Fuck You" twice
 void blinkFuckYou2X(void) {
   BUTTLED_ON;
 
