@@ -79,5 +79,6 @@ void blinkCrazy (void);
 void blinkYouFuck (void);
 void blinkFuckYou2X (void);
 void blinkAllOn (void);
+void FuckYouFuckFuckYou (void);
 
 #endif

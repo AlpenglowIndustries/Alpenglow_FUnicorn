@@ -319,3 +319,61 @@ void blinkFuckYou2X(void) {
 
   BUTTLED_OFF;
 }
+
+void FuckYouFuckFuckYou (void)
+{
+  BUTTLED_ON;
+  HORN_ON;
+
+  FUCK_ON;
+  delay(750);
+  FUCK_OFF;
+  delay(200);
+
+uint8_t i;
+for (i = 0; i < 255; i++) {
+  YOU_PWM = i;
+  BANG_PWM = i;
+  delay(3);
+}
+YOU_ON;
+BANG_ON;
+delay(750);
+
+for (i = 254; i < 255; i--) {
+  YOU_PWM = i;
+  BANG_PWM = i;
+  delay(3);
+}
+YOU_OFF;
+BANG_OFF;
+
+  FUCK_ON;
+  delay(500);
+  FUCK_OFF;
+  delay(200);
+  FUCK_ON;
+  delay(500);
+  FUCK_OFF;
+  delay(200);
+
+for (i = 0; i < 255; i++) {
+  YOU_PWM = i;
+  BANG_PWM = i;
+  delay(3);
+}
+YOU_ON;
+BANG_ON;
+delay(750);
+
+for (i = 254; i < 255; i--) {
+  YOU_PWM = i;
+  BANG_PWM = i;
+  delay(3);
+}
+YOU_OFF;
+BANG_OFF;
+HORN_OFF;
+
+BUTTLED_OFF;
+}
