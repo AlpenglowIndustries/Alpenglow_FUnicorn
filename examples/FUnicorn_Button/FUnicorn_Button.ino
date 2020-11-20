@@ -30,6 +30,66 @@ uint8_t checkButt() {
   return 0;
 }
 
+void FuckYouFuckFuckYou (void)
+{
+  BUTTLED_ON;
+  HORN_ON;
+
+  FUCK_ON;
+  delay(1000);
+  FUCK_OFF;
+  delay(500);
+
+uint8_t i;
+for (i = 0; i < 255; i++) {
+  YOU_PWM = i;
+  BANG_PWM = i;
+  delay(3);
+}
+YOU_ON;
+BANG_ON;
+delay(1000);
+
+for (i = 254; i < 255; i--) {
+  YOU_PWM = i;
+  BANG_PWM = i;
+  delay(3);
+}
+YOU_OFF;
+BANG_OFF;
+
+  FUCK_ON;
+  delay(500);
+  FUCK_OFF;
+  delay(200);
+  FUCK_ON;
+  delay(500);
+  FUCK_OFF;
+  delay(200);
+
+for (i = 0; i < 255; i++) {
+  YOU_PWM = i;
+  BANG_PWM = i;
+  delay(3);
+}
+YOU_ON;
+BANG_ON;
+delay(1000);
+
+for (i = 254; i < 255; i--) {
+  YOU_PWM = i;
+  BANG_PWM = i;
+  delay(3);
+}
+YOU_OFF;
+BANG_OFF;
+HORN_OFF;
+
+BUTTLED_OFF;
+}
+
+
+
 void setup() {
 
   initFUnicorn();
@@ -50,7 +110,7 @@ void loop() {
       if (checkButt()) {
         switch (counter % 5) {
           case 0:
-          blinkDemo();
+          FuckYouFuckFuckYou();
           break;
           case 1:
           blinkCrazy();
