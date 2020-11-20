@@ -47,39 +47,34 @@ void setup() {
   // pulses the horn LED once to show that it's on
   startupHornBlink();
 
+  gotoSleep();
+
 }
 
 void loop() {
 
     static uint16_t counter = 0;
 
-    // goes to sleep here
-    gotoSleep();
-    // wakes from sleep here when button is pressed
-
-    // keeps running checkButt for 1 second after waking up,
-    // checkButt returns a valid button press after debounce time has elapsed
-    while (millis() - buttTime < 1000) {
-      if (checkButt()) {
-        switch (counter % 5) {    // cycles through 5 patterns
-          case 0:
-          blinkDemo();
-          break;
-          case 1:
-          blinkCrazy();
-          break;
-          case 2:
-          FuckYouFuckFuckYou();
-          break;
-          case 3:
-          blinkFuckYou2X();
-          break;
-          case 4:
-          blinkAllOn();
-          break;
-        }
-        counter++;
+    if (checkButt()) {
+      switch (counter % 5) {    // cycles through 5 patterns
+        case 0:
+        blinkDemo();
+        break;
+        case 1:
+        blinkCrazy();
+        break;
+        case 2:
+        FuckYouFuckFuckYou();
+        break;
+        case 3:
+        blinkFuckYou2X();
+        break;
+        case 4:
+        blinkAllOn();
+        break;
       }
+      counter++;
       delay(10);
+      gotoSleep();
     }
 }
