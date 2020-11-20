@@ -4,9 +4,12 @@
 volatile uint8_t buttPress = 0;
 volatile uint32_t buttTime = 0;
 
+// records current time and sets buttPress to 1 to start debounce timing
 ISR(INT0_vect) {
-  buttTime = millis();
-  buttPress = 1;
+  if (buttPress == 0) {
+    buttPress = 1;
+    buttTime = millis();
+  }
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -17,15 +20,16 @@ ISR(INT0_vect) {
 //    (so it won't falsely trigger on button release bounces)
 // - returns 1 for a valid button press, otherwise 0
 ////////////////////////////////////////////////////////////////////////////
-
 uint8_t checkButt() {
-  EIMSK &= ~(1 << INT0);        // disables INT0 to guarantee clearing buttIsPressed
+  EIMSK &= ~(1 << INT0);        // disables INT0 to guarantee clearing buttPress
+
   if (buttPress && (millis() - buttTime > DEBOUNCE)) {
-    buttPress = 0;
+    buttPress = 0;              // clears buttPress to stop debounce timing
     EIMSK |= (1 << INT0);       // enables INT0
     if (BUTT_IS_PRESSED) return 1;
     else return 0;
   }
+
   EIMSK |= (1 << INT0);         // enables INT0
   return 0;
 }
@@ -92,11 +96,14 @@ BUTTLED_OFF;
 
 void setup() {
 
+  // sets up the unicorn
   initFUnicorn();
 
   // initializes the button as an interrupt source, both wakes from sleep and triggers LEDs
   initButt();
   sei();
+
+  // pulses the horn LED once to show that it's on
   startupHornBlink();
 
 }
@@ -105,10 +112,15 @@ void loop() {
 
     static uint16_t counter = 0;
 
+    // goes to sleep here
     gotoSleep();
+    // wakes from sleep here when button is pressed
+
+    // keeps running checkButt for 1 second after waking up,
+    // checkButt returns a valid button press after debounce time has elapsed
     while (millis() - buttTime < 1000) {
       if (checkButt()) {
-        switch (counter % 5) {
+        switch (counter % 5) {    // cycles through 5 patterns
           case 0:
           FuckYouFuckFuckYou();
           break;
