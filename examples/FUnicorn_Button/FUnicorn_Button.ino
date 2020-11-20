@@ -40,9 +40,9 @@ void FuckYouFuckFuckYou (void)
   HORN_ON;
 
   FUCK_ON;
-  delay(1000);
+  delay(750);
   FUCK_OFF;
-  delay(500);
+  delay(200);
 
 uint8_t i;
 for (i = 0; i < 255; i++) {
@@ -52,7 +52,7 @@ for (i = 0; i < 255; i++) {
 }
 YOU_ON;
 BANG_ON;
-delay(1000);
+delay(750);
 
 for (i = 254; i < 255; i--) {
   YOU_PWM = i;
@@ -78,7 +78,7 @@ for (i = 0; i < 255; i++) {
 }
 YOU_ON;
 BANG_ON;
-delay(1000);
+delay(750);
 
 for (i = 254; i < 255; i--) {
   YOU_PWM = i;
