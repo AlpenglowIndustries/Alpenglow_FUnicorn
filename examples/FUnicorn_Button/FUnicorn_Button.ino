@@ -47,7 +47,9 @@ void setup() {
   // pulses the horn LED once to show that it's on
   startupHornBlink();
 
+  // puts the unicorn to sleep until the button is pressed
   gotoSleep();
+  // wakes up from first button press here
 
 }
 
@@ -55,6 +57,7 @@ void loop() {
 
     static uint16_t counter = 0;
 
+    // checks validity of button press, when detected, executes a blink pattern
     if (checkButt()) {
       switch (counter % 5) {    // cycles through 5 patterns
         case 0:
@@ -75,6 +78,9 @@ void loop() {
       }
       counter++;
       delay(10);
+
+      // goes to sleep after executing a blink pattern
       gotoSleep();
+      // wakes up from sleep here
     }
 }
