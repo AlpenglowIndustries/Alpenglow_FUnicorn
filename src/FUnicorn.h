@@ -62,6 +62,10 @@
 // necessary if the button is used to interrupt the processor (or wake it from sleep)
 #define DEBOUNCE  30
 
+// defines modes of operation for ship code
+#define CAP_TOUCH 0
+#define BIG_RED_BUTT 1
+
 // initialization functions
 void initOutputs (void);          // sets up all LED pins
 void initButt (void);             // sets up button pin to be an interrupt
