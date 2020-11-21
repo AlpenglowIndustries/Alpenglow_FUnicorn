@@ -63,8 +63,8 @@
 #define DEBOUNCE  30
 
 // defines modes of operation for ship code
-#define CAP_TOUCH 0
-#define BIG_RED_BUTT 1
+#define CAP_AND_BUTT 0
+#define LOW_PWR_BUTT 1
 
 // initialization functions
 void initOutputs (void);          // sets up all LED pins

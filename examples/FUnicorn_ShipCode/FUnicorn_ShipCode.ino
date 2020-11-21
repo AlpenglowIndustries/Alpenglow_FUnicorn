@@ -8,11 +8,10 @@ int ref0;
 
 volatile uint8_t buttPress = 0;
 volatile uint32_t buttTime = 0;
-volatile uint8_t FUmode = CAP_TOUCH;
+volatile uint8_t FUmode = CAP_AND_BUTT;
 
 // records current time and sets buttPress to 1 to start debounce timing
 ISR(INT0_vect) {
-  FUmode = BIG_RED_BUTT;
   if (buttPress == 0) {
     buttPress = 1;
     buttTime = millis();
@@ -83,27 +82,28 @@ void setup() {
 
 ////////////////////////////////////////////////////////////////////////////
 // Main Loop
-// - behavior is determined by whether the Unicorn is in
-//    Capacitive Touch or Big Red Button mode
-// - default is Cap Touch mode, Big Red Button mode triggered by a button press
-//    (mode is set in ISR)
-// - to re-enter Cap Touch mode, press reset button or power cycle
-// - upon a Cap Touch or Big Red button press, a blink routine is executed
-// - Cap Touch mode needs constant power (cannot sleep)
-// - Big Red Button mode goes to sleep after a blink pattern is executed
+// - by default, the unicorn can be triggered by either Capacitive Touch or
+//    by pressing a Big Red Button (separate kit)
+// - if user presses and holds Big Red Button for 3 seconds, unicorn goes
+//    into Low Power Button-Only mode.  Best for battery operation.
+// - Cap Touch needs constant power (USB or wall wart)
+// - Low Power Button-Only mode goes to sleep after a blink pattern is executed,
+//    and wakes up with another button press
 ////////////////////////////////////////////////////////////////////////////
 
 void loop() {
 
     static uint16_t counter = 0;  // sets the initial value of counter but allows it to change with every loop
 
+    // Behavior is determined by mode
     switch (FUmode) {
 
-      // Uses Capacitive Touch to cycle through blink patterns
-      case CAP_TOUCH: {
+      // Uses Capacitive Touch or Big Red Button presses to cycle through blink patterns,
+      // Unicorn needs constant source of power (USB or wall wart)
+      case CAP_AND_BUTT: {
         int touchValue = ADCTouch.read(A0);   // no second parameter defaults to 100 samples
         touchValue -= ref0;                   // removes offset
-        if (touchValue > CAP_BUTT_PRESS) {
+        if ( (touchValue > CAP_BUTT_PRESS) || buttBlink ) {
           executeBlink(counter);
           counter++;
           delay(10);
@@ -111,8 +111,9 @@ void loop() {
       }
       break;
 
-      // Uses Big Red Button to cycle through blink patterns
-      case BIG_RED_BUTT: {
+      // Low Power Button mode, no Cap Touch and goes to sleep after a blink pattern is executed
+      // Best for battery power
+      case LOW_PWR_BUTT: {
         // checks validity of button press, when detected, executes a blink pattern
         if (checkButt()) {
           executeBlink(counter);
