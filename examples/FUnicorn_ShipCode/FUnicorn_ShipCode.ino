@@ -84,8 +84,8 @@ void setup() {
 // Main Loop
 // - by default, the unicorn can be triggered by either Capacitive Touch or
 //    by pressing a Big Red Button (separate kit)
-// - if user presses and holds Big Red Button for 3 seconds, unicorn goes
-//    into Low Power Button-Only mode.  Best for battery operation.
+// - if user presses and holds Big Red Button for the duration of a blinking pattern,
+//    unicorn goes into Low Power Button-Only mode.  Best for battery operation.
 // - Cap Touch needs constant power (USB or wall wart)
 // - Low Power Button-Only mode goes to sleep after a blink pattern is executed,
 //    and wakes up with another button press
@@ -103,10 +103,17 @@ void loop() {
       case CAP_AND_BUTT: {
         int touchValue = ADCTouch.read(A0);   // no second parameter defaults to 100 samples
         touchValue -= ref0;                   // removes offset
-        if ( (touchValue > CAP_BUTT_PRESS) || buttBlink ) {
+        if ( (touchValue > CAP_BUTT_PRESS) || checkButt() ) {
           executeBlink(counter);
           counter++;
           delay(10);
+          if (BUTT_IS_PRESSED) {              // checks to see if the button is (still) pressed
+            FUmode = LOW_PWR_BUTT;            // changes modes
+            delay(250);
+            startupHornBlink();               // visual verification of mode change
+            startupHornBlink();
+            gotoSleep();
+          }
         }
       }
       break;
