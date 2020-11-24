@@ -2,13 +2,14 @@
 #include "FUnicorn.h"
 #include <ADCTouch.h>
 
-#define CAP_BUTT_PRESS 50           // lower value is more senstive to touch, default = 50
+#define CAP_BUTT_PRESS 20           // lower value is more senstive to touch, default = 20
                                     // Different power supplies affect this, batteries need lower values
+                                    // The unicorn is a less senstivie touch button to begin with,
+                                    // as the GND plane behind it isn't unbroken.
 int ref0;
 
 volatile uint8_t buttPress = 0;
 volatile uint32_t buttTime = 0;
-volatile uint8_t FUmode = CAP_AND_BUTT;
 
 // records current time and sets buttPress to 1 to start debounce timing
 ISR(INT0_vect) {
@@ -92,8 +93,11 @@ void setup() {
 ////////////////////////////////////////////////////////////////////////////
 
 void loop() {
-
-    static uint16_t counter = 0;  // sets the initial value of counter but allows it to change with every loop
+  
+    // static variables are persistent between loops, allows the initial
+    // condition to be set for the first loop, then change with subsequent loops
+    static uint16_t counter = 0;
+    static uint8_t FUmode = CAP_AND_BUTT;
 
     // Behavior is determined by mode
     switch (FUmode) {
