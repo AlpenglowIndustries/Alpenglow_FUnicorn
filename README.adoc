@@ -1,7 +1,7 @@
 = FUnicorn Library Arduino-compatible =
 
 This library is used with the FUnicorn irreverent educational desk gadget by Alpenglow Industries
-Read about its development at: https://www.alpenglowindustries.com/blog
+Read about its development at: https://www.alpenglowindustries.com/funicorn
 
 For more information about this library please visit us at: www.alpenglowindustries.com
 

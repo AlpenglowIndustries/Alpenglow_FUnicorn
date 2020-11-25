@@ -11,9 +11,16 @@ FUnicorn	KEYWORD1
 # Methods and Functions (KEYWORD2)
 #######################################
 
-font	KEYWORD2
-defaults	KEYWORD2
-print	KEYWORD2
+initButt  KEYWORD2
+init  KEYWORD2
+sleep KEYWORD2
+hornBlink KEYWORD2
+blinkDemo KEYWORD2
+blinkCrazy  KEYWORD2
+blinkYouFuck  KEYWORD2
+blinkFuckYou2X  KEYWORD2
+blinkAllOn  KEYWORD2
+FuckYouFuckFuckYou  KEYWORD2
 
 #######################################
 # Constants (LITERAL1)

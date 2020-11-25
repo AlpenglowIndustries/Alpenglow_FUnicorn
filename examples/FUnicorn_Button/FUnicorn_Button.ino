@@ -1,13 +1,29 @@
+/*
 
-#include "FUnicorn.h"
+Welcome to the FUnicorn!
+written by Carrie Sundra for Alpenglow Industries
 
-volatile uint8_t buttPress = 0;
+This example sketch is for button-only activation, and uses a
+low-power sleep mode for battery operation.
+
+When you press the button, the FUnicorn executes a blink sequence.
+It cycles through 5 different sequences.
+The sequences are not interruptable, you must wait for one
+sequence to end before activating the next one.
+
+*/
+
+#include <FUnicorn.h>
+
+FUnicorn Fun;
+
+volatile uint8_t buttJustPressed = 0;
 volatile uint32_t buttTime = 0;
 
-// records current time and sets buttPress to 1 to start debounce timing
+// records current time and sets buttJustPressed to 1 to start debounce timing
 ISR(INT0_vect) {
-  if (buttPress == 0) {
-    buttPress = 1;
+  if (buttJustPressed == 0) {
+    buttJustPressed = 1;
     buttTime = millis();
   }
 }
@@ -21,10 +37,10 @@ ISR(INT0_vect) {
 // - returns 1 for a valid button press, otherwise 0
 ////////////////////////////////////////////////////////////////////////////
 uint8_t checkButt() {
-  EIMSK &= ~(1 << INT0);        // disables INT0 to guarantee clearing buttPress
+  EIMSK &= ~(1 << INT0);        // disables INT0 to guarantee clearing buttJustPressed
 
-  if (buttPress && (millis() - buttTime > DEBOUNCE)) {
-    buttPress = 0;              // clears buttPress to stop debounce timing
+  if (buttJustPressed && (millis() - buttTime > DEBOUNCE)) {
+    buttJustPressed = 0;        // clears buttJustPressed to stop debounce timing
     EIMSK |= (1 << INT0);       // enables INT0
     if (BUTT_IS_PRESSED) return 1;
     else return 0;
@@ -38,17 +54,17 @@ uint8_t checkButt() {
 void setup() {
 
   // sets up the unicorn
-  initFUnicorn();
+  Fun.init();
 
   // initializes the button as an interrupt source, both wakes from sleep and triggers LEDs
-  initButt();
+  Fun.initButt();
   sei();
 
   // pulses the horn LED once to show that it's on
-  startupHornBlink();
+  Fun.hornBlink();
 
   // puts the unicorn to sleep until the button is pressed
-  gotoSleep();
+  Fun.sleep();
   // wakes up from first button press here
 
 }
@@ -61,26 +77,26 @@ void loop() {
     if (checkButt()) {
       switch (counter % 5) {    // cycles through 5 patterns
         case 0:
-        blinkDemo();
+        Fun.blinkDemo();
         break;
         case 1:
-        blinkCrazy();
+        Fun.blinkCrazy();
         break;
         case 2:
-        FuckYouFuckFuckYou();
+        Fun.FuckYouFuckFuckYou();
         break;
         case 3:
-        blinkFuckYou2X();
+        Fun.blinkFuckYou2X();
         break;
         case 4:
-        blinkAllOn();
+        Fun.blinkAllOn();
         break;
       }
       counter++;
       delay(10);
 
       // goes to sleep after executing a blink pattern
-      gotoSleep();
+      Fun.sleep();
       // wakes up from sleep here
     }
 }

@@ -1,8 +1,13 @@
 /************************************************
 
-  FUnicorn is a library designed for use with the Alpenglow Industries Fuck Younicorn - an irreverent
+  FUnicorn is a library designed for use with the Alpenglow Industries FUnicorn - an irreverent
   and educational desk gadget.  It's Arduino-compatible and should be portable to most boards running
-  an ATMega328P.
+  an ATMega328P.  It was originally written outside of the Arduino environment, so you'll see
+  port calls and bitwise operations used instead of the typical digitalOutput() and pinMode() calls.
+  It's just a different way of writing the same thing.  If you want to learn more about how to
+  directly read and write to hardware registers, the book Make! AVR Programming by Elliot Williams
+  is a great reference.  If you're a beginner and just want examples of blinking code, scroll to
+  the bottom.
 
   Copyright 2018, by Carrie Sundra for Alpenglow Industries
   All rights reserved.
@@ -10,13 +15,11 @@
 
   ************************************************/
 
-// Are you a beginner?  Scroll down to the Blink Routines section, that's the fun part.
-
 ///////////////////////////////////////////////////
 // Includes
 ///////////////////////////////////////////////////
 #include "FUnicorn.h"
-#include <Arduino.h>
+#include <Arduino.h>  // only used for delay()
 #include <util/atomic.h>
 #include <avr/sleep.h>
 
@@ -24,8 +27,10 @@
 // Initialization Functions
 ///////////////////////////////////////////////////
 
+FUnicorn::FUnicorn() {}
+
 // sets all LEDs as outputs and OFF
-void initOutputs (void) {
+void FUnicorn::initOutputs() {
   // sets the following to outputs
   PORTB = 0;
   PORTD = 0;
@@ -34,21 +39,21 @@ void initOutputs (void) {
 }
 
 // sets up the external button as an interrupt
-void initButt (void) {
+void FUnicorn::initButt() {
   EICRA |= (1 << ISC01);      // INT0 triggers on falling edge
   EIMSK |= (1 << INT0);       // enables INT0
 };
 
 // initializes PWM outputs on HORN and FUCK
-void initFuckHornTimer (void) {
+void FUnicorn::initFuckHornTimer() {
   TCCR2A |= (1 << COM2A1) | (1 << COM2B1) | (1 << WGM20);   // Phase correct PWM, 0xFF is top, 8-bit
   OCR2A = 0;                  // should start as solid off
   OCR2B = 0;
   TCCR2B |= (1 << CS20);      // enables the clock with a prescaler of 1
 }
 
-// initializes PWM outputs on BAND and YOU
-void initBangYouTimer (void) {
+// initializes PWM outputs on BANG and YOU
+void FUnicorn::initBangYouTimer() {
   TCCR1A |= (1 << COM1A1) | (1 << COM1B1) | (1 << WGM10);   // Phase correct PWM, 0x00FF is top, 8-bit
   ATOMIC_BLOCK(ATOMIC_FORCEON){       // atomic operation for 16-bit register writes
     OCR1A = 0;                        // should start as solid off
@@ -58,7 +63,7 @@ void initBangYouTimer (void) {
 }
 
 // Calls initialization functions common to all FUnicorn demos
-void initFUnicorn (void)  {
+void FUnicorn::init() {
 
   initOutputs();
 
@@ -77,7 +82,8 @@ void initFUnicorn (void)  {
 // - enables the timers, initializes outputs again
 ///////////////////////////////////////////////////
 
-void gotoSleep(void) {
+void FUnicorn::sleep() {
+
   uint8_t acsr_status = ACSR;
   ACSR = 0;
   uint8_t adcsra_status = ADCSRA;
@@ -117,7 +123,8 @@ void gotoSleep(void) {
 ///////////////////////////////////////////////////
 
 // pulses the Horn LED once
-void startupHornBlink (void) {
+void FUnicorn::hornBlink() {
+
   uint8_t j;
   for (j = 0; j < 255; j++) {
     HORN_PWM = j;
@@ -134,7 +141,8 @@ void startupHornBlink (void) {
 }
 
 // 4-part blink routine
-void blinkDemo (void) {
+void FUnicorn::blinkDemo() {
+
   BUTTLED_ON;
   delay(500);
 
@@ -198,8 +206,8 @@ void blinkDemo (void) {
 }
 
 // slowly blinks "Fuck You, You Fuck !!!"
-void blinkYouFuck (void)
-{
+void FUnicorn::blinkYouFuck() {
+
   BUTTLED_ON;
   HORN_ON;
 
@@ -234,7 +242,7 @@ void blinkYouFuck (void)
 }
 
 // everything flashes super fast like crazy
-void blinkCrazy (void) {
+void FUnicorn::blinkCrazy() {
 
   BUTTLED_ON;
 
@@ -257,8 +265,9 @@ void blinkCrazy (void) {
   BUTTLED_OFF;
 }
 
-//
-void blinkAllOn(void) {
+// pulses the entire message
+void FUnicorn::blinkAllOn() {
+
   BUTTLED_ON;
 
   // pulses all LEDs to solid ON
@@ -295,7 +304,7 @@ void blinkAllOn(void) {
 }
 
 // slowly blinks "Fuck You" twice
-void blinkFuckYou2X(void) {
+void FUnicorn::blinkFuckYou2X() {
   BUTTLED_ON;
 
   uint8_t j;
@@ -320,8 +329,9 @@ void blinkFuckYou2X(void) {
   BUTTLED_OFF;
 }
 
-void FuckYouFuckFuckYou (void)
-{
+// blinks "Fuck, You, Fuck, Fuck, You"  A good one for emphasis.
+void FUnicorn::FuckYouFuckFuckYou() {
+
   BUTTLED_ON;
   HORN_ON;
 

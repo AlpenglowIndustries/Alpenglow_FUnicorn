@@ -66,23 +66,30 @@
 #define CAP_AND_BUTT 0
 #define LOW_PWR_BUTT 1
 
-// initialization functions
-void initOutputs (void);          // sets up all LED pins
-void initButt (void);             // sets up button pin to be an interrupt
-void initFuckHornTimer (void);    // sets up timer module used for Fuck and Horn LEDs
-void initBangYouTimer (void);     // sets up timer module used for Bang and You LEDs
-void initFUnicorn (void);         // initializes all of the above
+class FUnicorn {
+public:
+  FUnicorn();
+  // initialization functions
+  void initButt(void);             // sets up button pin to be an interrupt
+  void init(void);         // initializes all of the above
 
-// sleep function
-void gotoSleep (void);
+  // sleep function
+  void sleep(void);
 
-// blink pattern functions
-void startupHornBlink (void);
-void blinkDemo (void);
-void blinkCrazy (void);
-void blinkYouFuck (void);
-void blinkFuckYou2X (void);
-void blinkAllOn (void);
-void FuckYouFuckFuckYou (void);
+  // blink pattern functions
+  void hornBlink(void);
+  void blinkDemo(void);
+  void blinkCrazy(void);
+  void blinkYouFuck(void);
+  void blinkFuckYou2X(void);
+  void blinkAllOn(void);
+  void FuckYouFuckFuckYou(void);
+
+private:
+  // used by initFUnicorn
+  void initOutputs(void);          // sets up all LED pins
+  void initFuckHornTimer(void);    // sets up timer module used for Fuck and Horn LEDs
+  void initBangYouTimer(void);     // sets up timer module used for Bang and You LEDs
+};
 
 #endif

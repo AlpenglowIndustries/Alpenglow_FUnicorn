@@ -1,20 +1,40 @@
+/*
 
-#include "FUnicorn.h"
+Welcome to the FUnicorn!
+written by Carrie Sundra for Alpenglow Industries
+
+This example sketch is the code the FUnicorn ships with.
+You can activate the LED message by either touching the unicorn or pressing
+an external button.  Pressing and holding the button for the duration of a blink
+sequence puts the FUnicorn into a low power button-only mode.  Best for battery
+operation, note that capacitive touch on the unicorn is disabled.  Re-enable
+capacitive touch by power cycling or pressing the onboard blue reset button.
+
+When the FUnicorn is activated, it executes a blink sequence.
+It cycles through 5 different sequences.
+The sequences are not interruptable, you must wait for one
+sequence to end before activating the next one.
+
+*/
+
+#include <FUnicorn.h>
 #include <ADCTouch.h>
 
 #define CAP_BUTT_PRESS 20           // lower value is more senstive to touch, default = 20
                                     // Different power supplies affect this, batteries need lower values
                                     // The unicorn is a less senstivie touch button to begin with,
                                     // as the GND plane behind it isn't unbroken.
-int ref0;
+int capRef;
 
-volatile uint8_t buttPress = 0;
+FUnicorn Fun;
+
+volatile uint8_t buttJustPressed = 0;
 volatile uint32_t buttTime = 0;
 
-// records current time and sets buttPress to 1 to start debounce timing
+// records current time and sets buttJustPressed to 1 to start debounce timing
 ISR(INT0_vect) {
-  if (buttPress == 0) {
-    buttPress = 1;
+  if (buttJustPressed == 0) {
+    buttJustPressed = 1;
     buttTime = millis();
   }
 }
@@ -28,10 +48,10 @@ ISR(INT0_vect) {
 // - returns 1 for a valid button press, otherwise 0
 ////////////////////////////////////////////////////////////////////////////
 uint8_t checkButt() {
-  EIMSK &= ~(1 << INT0);        // disables INT0 to guarantee clearing buttPress
+  EIMSK &= ~(1 << INT0);        // disables INT0 to guarantee clearing buttJustPressed
 
-  if (buttPress && (millis() - buttTime > DEBOUNCE)) {
-    buttPress = 0;              // clears buttPress to stop debounce timing
+  if (buttJustPressed && (millis() - buttTime > DEBOUNCE)) {
+    buttJustPressed = 0;        // clears buttJustPressed to stop debounce timing
     EIMSK |= (1 << INT0);       // enables INT0
     if (BUTT_IS_PRESSED) return 1;
     else return 0;
@@ -46,19 +66,19 @@ uint8_t checkButt() {
 void executeBlink (uint16_t cntr) {
   switch (cntr % 5) {    // cycles through 5 patterns
     case 0:
-    blinkDemo();
+    Fun.blinkDemo();
     break;
     case 1:
-    blinkCrazy();
+    Fun.blinkCrazy();
     break;
     case 2:
-    FuckYouFuckFuckYou();
+    Fun.FuckYouFuckFuckYou();
     break;
     case 3:
-    blinkFuckYou2X();
+    Fun.blinkFuckYou2X();
     break;
     case 4:
-    blinkAllOn();
+    Fun.blinkAllOn();
     break;
   }
 }
@@ -66,17 +86,17 @@ void executeBlink (uint16_t cntr) {
 void setup() {
 
   // sets up the unicorn
-  initFUnicorn();
+  Fun.init();
 
   // initializes the capacitive touch button value
-  ref0 = ADCTouch.read(A0, 500);    // create reference values to account for touch offset
+  capRef = ADCTouch.read(A0, 500);    // create reference values to account for touch offset
 
   // initializes the button as an interrupt source, both wakes from sleep and triggers LEDs
-  initButt();
+  Fun.initButt();
   sei();
 
   // pulses the horn LED once to show that it's on
-  startupHornBlink();
+  Fun.hornBlink();
 
 }
 
@@ -93,7 +113,7 @@ void setup() {
 ////////////////////////////////////////////////////////////////////////////
 
 void loop() {
-  
+
     // static variables are persistent between loops, allows the initial
     // condition to be set for the first loop, then change with subsequent loops
     static uint16_t counter = 0;
@@ -106,7 +126,7 @@ void loop() {
       // Unicorn needs constant source of power (USB or wall wart)
       case CAP_AND_BUTT: {
         int touchValue = ADCTouch.read(A0);   // no second parameter defaults to 100 samples
-        touchValue -= ref0;                   // removes offset
+        touchValue -= capRef;                   // removes offset
         if ( (touchValue > CAP_BUTT_PRESS) || checkButt() ) {
           executeBlink(counter);
           counter++;
@@ -114,9 +134,9 @@ void loop() {
           if (BUTT_IS_PRESSED) {              // checks to see if the button is (still) pressed
             FUmode = LOW_PWR_BUTT;            // changes modes
             delay(250);
-            startupHornBlink();               // visual verification of mode change
-            startupHornBlink();
-            gotoSleep();
+            Fun.hornBlink();               // visual verification of mode change
+            Fun.hornBlink();
+            Fun.sleep();
           }
         }
       }
@@ -131,7 +151,7 @@ void loop() {
           counter++;
           delay(10);
           // goes to sleep here to reduce power
-          gotoSleep();
+          Fun.sleep();
           // wakes up from sleep here
         }
       }
