@@ -16,7 +16,7 @@ sequence to end before activating the next one.
 #include <FUnicorn.h>
 #include <ADCTouch.h>
 
-#define CAP_BUTT_PRESS 50           // lower value is more senstive to touch, default = 50
+#define CAP_BUTT_PRESS 20           // lower value is more senstive to touch, default = 50
                                     // Different power supplies affect this, batteries need lower values
 int capRef;
 
