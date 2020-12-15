@@ -46,7 +46,7 @@ void setup() {
   // pulses the horn LED once to show that it's on
   Fun.hornBlink();
 
-  Serial.begin(9600);
+//  Serial.begin(9600);
 
 }
 
@@ -54,8 +54,8 @@ void loop() {
 
     static uint16_t counter = 0;
     int distance =  ultrasonic.read(INC);
-    Serial.print("distance = ");
-    Serial.println(distance);
+//    Serial.print("distance = ");
+//    Serial.println(distance);
 
     // if distance is not zero and under six feet, blink pattern executes
     if (distance && distance < SIXFEET) {
