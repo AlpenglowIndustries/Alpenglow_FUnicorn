@@ -43,10 +43,6 @@ void setup() {
   // sets up the unicorn
   Fun.init();
 
-  // initializes the button as an interrupt source, both wakes from sleep and triggers LEDs
-  Fun.initButt();
-  sei();
-
   // pulses the horn LED once to show that it's on
   Fun.hornBlink();
 
