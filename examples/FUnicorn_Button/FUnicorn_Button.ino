@@ -17,9 +17,15 @@ sequence to end before activating the next one.
 
 FUnicorn Fun;
 
+// variables used with interrupt routines must be declared as volatile
+// explicit variable types are used for clarity
+// uintX_t = unsigned integer = no negative values
+  // X = number of bits in the integer, 8 = 8 bits, = 0-255 for unsigned.
+  // signed value would be -128 to 127.  Asymmetric because 0 is a value.
 volatile uint8_t buttJustPressed = 0;
 volatile uint32_t buttTime = 0;
 
+// The Interrupt Routine which handles external button presses.
 // records current time and sets buttJustPressed to 1 to start debounce timing
 ISR(INT0_vect) {
   if (buttJustPressed == 0) {
@@ -39,13 +45,17 @@ ISR(INT0_vect) {
 uint8_t checkButt() {
   EIMSK &= ~(1 << INT0);        // disables INT0 to guarantee clearing buttJustPressed
 
+  // debounce time is up and we have not yet checked the button state
   if (buttJustPressed && (millis() - buttTime > DEBOUNCE)) {
     buttJustPressed = 0;        // clears buttJustPressed to stop debounce timing
     EIMSK |= (1 << INT0);       // enables INT0
+    // assumes bouncing is done, if button is still pressed, then it's a button press!
+    // otherwise maybe it was bouncing when the button was released, so it ignores that.
     if (BUTT_IS_PRESSED) return 1;
     else return 0;
   }
 
+  // debounce time isn't done yet, or another button press hasn't come in yet
   EIMSK |= (1 << INT0);         // enables INT0
   return 0;
 }
@@ -53,14 +63,14 @@ uint8_t checkButt() {
 
 void setup() {
 
-  // sets up the unicorn
+  // sets up the unicorn inputs and outputs and timers
   Fun.init();
 
   // initializes the button as an interrupt source, both wakes from sleep and triggers LEDs
   Fun.initButt();
-  sei();
+  sei();  // enables all interrupts
 
-  // pulses the horn LED once to show that it's on
+  // pulses the horn LED once to show that it's on, or has freshly reset
   Fun.hornBlink();
 
   // puts the unicorn to sleep until the button is pressed
@@ -71,9 +81,11 @@ void setup() {
 
 void loop() {
 
+    // initializes a counter variable, used to cycle through blinking patterns
     static uint16_t counter = 0;
 
     // checks validity of button press, when detected, executes a blink pattern
+    // equivalent to if (checkButt() == 1)
     if (checkButt()) {
       switch (counter % 5) {    // cycles through 5 patterns
         case 0:
