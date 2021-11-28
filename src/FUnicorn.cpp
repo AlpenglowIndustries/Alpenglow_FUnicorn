@@ -6,10 +6,18 @@
   port calls and bitwise operations used instead of the typical digitalOutput() and pinMode() calls.
   It's just a different way of writing the same thing.  If you want to learn more about how to
   directly read and write to hardware registers, the book Make! AVR Programming by Elliot Williams
-  is a great reference.  If you're a beginner and just want examples of blinking code, scroll to
+  is a great reference.  https://www.makershed.com/products/make-avr-programming
+
+  If you're a beginner and just want examples of blinking code, scroll to
   the bottom.
 
-  Copyright 2018, by Carrie Sundra for Alpenglow Industries
+  We've added comments to the code, to help you equate arduino functions to standard C with the
+  built-in AVR register definitions.
+
+  Check out the ATMEGA328P datasheet!  It tells you everything about the registers and how they're set
+  and used.  https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf
+
+  Copyright 2018-2021, by Carrie Sundra for Alpenglow Industries
   All rights reserved.
   License: MIT
 
@@ -31,14 +39,22 @@ FUnicorn::FUnicorn() {}
 
 // sets all LEDs as outputs and OFF
 void FUnicorn::initOutputs() {
-  // sets the following to outputs
+  // sets D0-D13 output values to zero
   PORTB = 0;
   PORTD = 0;
+  // data direction registers D and B
+  // sets all LED bank pins to outputs
+  // equivalent to pinMode(pin, OUTPUT);
+  // FUCK and BUTLED are on port D, everything else on port B
+  // see FUnicorn.h for the pin/port mapping
   DDRD |= ((1 << FUCK) | (1 << BUTTLED));
   DDRB |= ((1 << BANG) | (1 << YOU) | (1 << HORN));
 }
 
-// sets up the external button as an interrupt
+// sets up the external button as an interrupt on INT0
+// equivalent to attachInterrupt(digitalPinToInterrupt(2), ISR(INT0_vect), FALLING);
+// Interrupt functions are called ISRs (interrupt service routines)
+// Built-in AVR nomenclature used, you'll find them in the example code before setup()
 void FUnicorn::initButt() {
   EICRA |= (1 << ISC01);      // INT0 triggers on falling edge
   EIMSK |= (1 << INT0);       // enables INT0
@@ -67,7 +83,7 @@ void FUnicorn::init() {
 
   initOutputs();
 
-  //comment out these two if not using PWMs to dim/pulse LEDs
+  //sets up PWMs to dim/pulse LEDs
   initFuckHornTimer();
   initBangYouTimer();
 
@@ -84,6 +100,8 @@ void FUnicorn::init() {
 
 void FUnicorn::sleep() {
 
+// saves the status of different modules: analog comparator, adc, timers and watchdog
+// then sets all main registers to 0 which disables them
   uint8_t acsr_status = ACSR;
   ACSR = 0;
   uint8_t adcsra_status = ADCSRA;
@@ -97,25 +115,36 @@ void FUnicorn::sleep() {
   uint8_t watchdog_status = WDTCSR;
   WDTCSR = 0;
 
+// Power Reduction Register
+// powers down individual modules
   //  PRR |= ((1 << PRTIM0) | (1 << PRTIM1) | (1 << PRTIM2) | (1 << PRADC) | (1 << PRTWI) | (1 << PRSPI) | (1 << PRUSART0));
   PRR |= ((1 << PRTIM0) | (1 << PRTIM1) | (1 << PRTIM2) | (1 << PRADC) | (1 << PRTWI) | (1 << PRSPI));
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
   SMCR |= (1 << SE);    // enables sleep mode
-  sleep_bod_disable();
+  sleep_bod_disable();  // disables the brown-out detector reset
   sleep_cpu();
   // goes to sleep
+  // ....sleeps until the button is pressed
 
   // wakes from sleep
   SMCR &= ~(1 << SE);   // disables sleep mode
-//  PRR &= ~((1 << PRTIM0) | (1 << PRTIM1) | (1 << PRTIM2) | (1 << PRADC) | (1 << PRTWI) | (1 << PRSPI) | (1 << PRUSART0));
+
+// clears the power reduction register, disables power-down for modules
+  //  PRR &= ~((1 << PRTIM0) | (1 << PRTIM1) | (1 << PRTIM2) | (1 << PRADC) | (1 << PRTWI) | (1 << PRSPI) | (1 << PRUSART0));
   PRR &= ~((1 << PRTIM0) | (1 << PRTIM1) | (1 << PRTIM2) | (1 << PRADC) | (1 << PRTWI) | (1 << PRSPI));
+
+// sets all modules to their previously saved statuses
   TCCR2B = timer2_status;
   TCCR1B = timer1_status;
   TCCR0B = timer0_status;
   WDTCSR = watchdog_status;
   ADCSRA = adcsra_status;
   ACSR = acsr_status;
+
+// re-initializes the LED bank outputs
   initOutputs();
+
+// now the code is ready to continue, everything is fully awake and operating
 }
 
 ///////////////////////////////////////////////////
@@ -194,7 +223,7 @@ void FUnicorn::blinkDemo() {
   }
   HORN_PWM = ON;
 
-  // everthing is solid ON for 2 seconds
+  // everything is solid ON for 2 seconds
   delay(2000);
 
   // turns all LEDs off
