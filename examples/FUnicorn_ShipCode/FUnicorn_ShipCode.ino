@@ -26,11 +26,18 @@ sequence to end before activating the next one.
                                     // as the GND plane behind it isn't unbroken.
 int capRef;
 
-FUnicorn Fun;
+FUnicorn Fun;   // sets up an FUnicorn "object", allowing you to use functions in FUnicorn.cpp
 
+
+// variables used with interrupt routines must be declared as volatile
+// explicit variable types are used for clarity
+// uintX_t = unsigned integer = no negative values
+  // X = number of bits in the integer, 8 = 8 bits, = 0-255 for unsigned.
+  // signed value would be -128 to 127.  Asymmetric because 0 is a value.
 volatile uint8_t buttJustPressed = 0;
 volatile uint32_t buttTime = 0;
 
+// The Interrupt Routine which handles external button presses.
 // records current time and sets buttJustPressed to 1 to start debounce timing
 ISR(INT0_vect) {
   if (buttJustPressed == 0) {
@@ -50,18 +57,22 @@ ISR(INT0_vect) {
 uint8_t checkButt() {
   EIMSK &= ~(1 << INT0);        // disables INT0 to guarantee clearing buttJustPressed
 
+  // debounce time is up and we have not yet checked the button state
   if (buttJustPressed && (millis() - buttTime > DEBOUNCE)) {
     buttJustPressed = 0;        // clears buttJustPressed to stop debounce timing
     EIMSK |= (1 << INT0);       // enables INT0
+    // assumes bouncing is done, if button is still pressed, then it's a button press!
+    // otherwise maybe it was bouncing when the button was released, so it ignores that.
     if (BUTT_IS_PRESSED) return 1;
     else return 0;
   }
 
+  // debounce time isn't done yet, or another button press hasn't come in yet
   EIMSK |= (1 << INT0);         // enables INT0
   return 0;
 }
 
-// The cycle of blink patterns
+// Performs a blink pattern depending on number passed in as cntr
 // Details for each in FUnicorn.cpp
 void executeBlink (uint16_t cntr) {
   switch (cntr % 5) {    // cycles through 5 patterns
@@ -93,9 +104,9 @@ void setup() {
 
   // initializes the button as an interrupt source, both wakes from sleep and triggers LEDs
   Fun.initButt();
-  sei();
+  sei();  // enables all interrupts, equivalent to interrupts();
 
-  // pulses the horn LED once to show that it's on
+  // pulses the horn LED once to show that it's on or freshly reset
   Fun.hornBlink();
 
 }
@@ -107,6 +118,7 @@ void setup() {
 //    by pressing a Big Red Button (separate kit)
 // - if user presses and holds Big Red Button for the duration of a blinking pattern,
 //    unicorn goes into Low Power Button-Only mode.  Best for battery operation.
+//    To re-enable capacitive touch mode, cycle power to the FUnicorn.
 // - Cap Touch needs constant power (USB or wall wart)
 // - Low Power Button-Only mode goes to sleep after a blink pattern is executed,
 //    and wakes up with another button press
@@ -123,20 +135,21 @@ void loop() {
     switch (FUmode) {
 
       // Uses Capacitive Touch or Big Red Button presses to cycle through blink patterns,
-      // Unicorn needs constant source of power (USB or wall wart)
+      // Unicorn needs constant source of power (USB or wall wart) for Cap Touch mode
       case CAP_AND_BUTT: {
         int touchValue = ADCTouch.read(A0);   // no second parameter defaults to 100 samples
         touchValue -= capRef;                   // removes offset
-        if ( (touchValue > CAP_BUTT_PRESS) || checkButt() ) {
-          executeBlink(counter);
-          counter++;
+        if ( (touchValue > CAP_BUTT_PRESS) || checkButt() ) { // triggers on cap touch or button press
+          executeBlink(counter);  // performs a blinking pattern
+          counter++;              // so that next pattern will execute next time
           delay(10);
           if (BUTT_IS_PRESSED) {              // checks to see if the button is (still) pressed
-            FUmode = LOW_PWR_BUTT;            // changes modes
+            FUmode = LOW_PWR_BUTT;            // changes modes to low power button-only
             delay(250);
             Fun.hornBlink();               // visual verification of mode change
             Fun.hornBlink();
-            Fun.sleep();
+            Fun.sleep();                  // goes into low power sleep mode
+                                          // wakes from sleep here
           }
         }
       }
@@ -158,3 +171,5 @@ void loop() {
       break;
     }
 }
+
+// to re-enable capacitive touch mode, cycle power

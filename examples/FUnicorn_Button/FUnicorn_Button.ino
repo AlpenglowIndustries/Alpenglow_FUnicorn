@@ -15,7 +15,7 @@ sequence to end before activating the next one.
 
 #include <FUnicorn.h>
 
-FUnicorn Fun;
+FUnicorn Fun; // sets up an FUnicorn "object", allowing you to use functions in FUnicorn.cpp
 
 // variables used with interrupt routines must be declared as volatile
 // explicit variable types are used for clarity
@@ -68,7 +68,7 @@ void setup() {
 
   // initializes the button as an interrupt source, both wakes from sleep and triggers LEDs
   Fun.initButt();
-  sei();  // enables all interrupts
+  sei();  // enables all interrupts, equivalent to interrupts();
 
   // pulses the horn LED once to show that it's on, or has freshly reset
   Fun.hornBlink();

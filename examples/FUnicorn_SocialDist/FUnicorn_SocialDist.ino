@@ -33,9 +33,10 @@ It continuously powers and polls the ultrasonic sensor, best
 #include <FUnicorn.h>
 #include <Ultrasonic.h>
 
-#define SIXFEET 72
+#define SIXFEET 72  // a 6-ft distqnce reading on the sensor
 
-FUnicorn Fun;
+FUnicorn Fun;  // sets up an FUnicorn "object", allowing you to use functions in FUnicorn.cpp
+
 Ultrasonic ultrasonic(12, 13);  // (trig, echo)
 
 void setup() {
@@ -43,10 +44,10 @@ void setup() {
   // sets up the unicorn
   Fun.init();
 
-  // pulses the horn LED once to show that it's on
+  // pulses the horn LED once to show that it's on or freshly reset
   Fun.hornBlink();
 
-//  Serial.begin(9600);
+//  Serial.begin(9600);  // useful for debugging, determining distance setting
 
 }
 
@@ -79,5 +80,5 @@ void loop() {
       counter++;
       delay(10);
     }
-    delay(100);
+    delay(100); // slows down loop to checking a max of 10 times per second
 }
