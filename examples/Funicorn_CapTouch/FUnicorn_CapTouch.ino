@@ -24,9 +24,9 @@ FUnicorn Fun;   // sets up an FUnicorn "object", allowing you to use functions i
 
 void setup() {
 
-  Fun.init();                   // sets up outputs and timers
+  Fun.init();                         // sets up outputs and timers
   capRef = ADCTouch.read(A0, 500);    // create reference values to account for touch offset
-  Fun.hornBlink();               // blinks horn once to indicate it's ready
+  Fun.hornBlink();                    // blinks horn once to indicate it's ready
 
 void loop() {
 

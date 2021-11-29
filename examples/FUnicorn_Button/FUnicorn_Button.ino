@@ -21,7 +21,7 @@ FUnicorn Fun; // sets up an FUnicorn "object", allowing you to use functions in 
 // explicit variable types are used for clarity
 // uintX_t = unsigned integer = no negative values
   // X = number of bits in the integer, 8 = 8 bits, = 0-255 for unsigned.
-  // signed value would be -128 to 127.  Asymmetric because 0 is a value.
+  // signed value would be int8_t, = -128 to 127.  Asymmetric because 0 is a value.
 volatile uint8_t buttJustPressed = 0;
 volatile uint32_t buttTime = 0;
 
@@ -44,11 +44,17 @@ ISR(INT0_vect) {
 ////////////////////////////////////////////////////////////////////////////
 uint8_t checkButt() {
   EIMSK &= ~(1 << INT0);        // disables INT0 to guarantee clearing buttJustPressed
+                                // equivalent to detachInterrupt(digitalPinToInterrupt(2));
+                                // (1 << INT0) bit-shifts a "1" into the interrupt 0 position in the EIMSK register
+                                // &= is shorthand for saying EIMSTK = EIMSK & ~(1 << INT0);
+                                // & ~ clears the INT0 bit (sets it to 0) in the EIMSK register without affecting other bit values
 
   // debounce time is up and we have not yet checked the button state
   if (buttJustPressed && (millis() - buttTime > DEBOUNCE)) {
     buttJustPressed = 0;        // clears buttJustPressed to stop debounce timing
-    EIMSK |= (1 << INT0);       // enables INT0
+    EIMSK |= (1 << INT0);       // enables INT0, same shorthand as above except that "OR" "|" sets a bit to 1
+                                // somewhat equivalent to attachInterrupt(), re-enables it without changing behavior (already set to falling edge)
+
     // assumes bouncing is done, if button is still pressed, then it's a button press!
     // otherwise maybe it was bouncing when the button was released, so it ignores that.
     if (BUTT_IS_PRESSED) return 1;
@@ -63,7 +69,7 @@ uint8_t checkButt() {
 
 void setup() {
 
-  // sets up the unicorn inputs and outputs and timers
+  // sets up the default unicorn inputs and outputs and timers
   Fun.init();
 
   // initializes the button as an interrupt source, both wakes from sleep and triggers LEDs

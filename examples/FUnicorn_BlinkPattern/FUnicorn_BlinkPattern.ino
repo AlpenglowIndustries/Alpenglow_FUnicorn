@@ -3,7 +3,7 @@
 Welcome to the FUnicorn!
 written by Carrie Sundra for Alpenglow Industries
 
-This example sketch is the code the FUnicorn ships with.
+This is a derivative of ShipCode, with an example of creating your own blinking pattern.
 You can activate the LED message by either touching the unicorn or pressing
 an external button.  Pressing and holding the button for the duration of a blink
 sequence puts the FUnicorn into a low power button-only mode.  Best for battery
@@ -82,9 +82,9 @@ uint8_t checkButt() {
 // Performs a blink pattern depending on number passed in as cntr
 // Details for each in FUnicorn.cpp
 void executeBlink (uint16_t cntr) {
-  switch (cntr % 5) {    // cycles through 5 patterns
+  switch (cntr % 2) {    // cycles through 5 patterns
     case 0:
-    Fun.blinkDemo();
+    myBlink();
     break;
     case 1:
     Fun.blinkCrazy();
@@ -99,6 +99,50 @@ void executeBlink (uint16_t cntr) {
     Fun.blinkAllOn();
     break;
   }
+}
+
+// example of a custom blink pattern using shortcuts defined in FUnicorn.h
+void myBlink () {
+  HORN_ON;
+  delay(200);
+  FUCK_ON;
+  delay(200);
+  YOU_ON;
+  delay(200);
+  BANG_ON;
+  delay(500);
+  FUCK_OFF;
+  YOU_OFF;
+  BANG_OFF;
+
+  unit8_t i, j;
+  for (i = 0; i < 2; i++) {
+    for (j = 0; j < 255; j++) {
+      FUCK_PWM = j;
+      YOU_PWM = j;
+      BANG_PWM = j;
+      delay(5);
+    }
+
+    FUCK_ON;
+    YOU_ON;
+    BANG_ON;
+    delay(250);
+
+    for (j = 255; j > 0; j--) {
+      FUCK_PWM = j;
+      YOU_PWM = j;
+      BANG_PWM = j;
+      delay(5);
+    }
+
+    FUCK_OFF;
+    YOU_OFF;
+    BANG_OFF;
+    delay(250);
+  }
+
+  HORN_OFF;
 }
 
 void setup() {

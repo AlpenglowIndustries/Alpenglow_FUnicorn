@@ -5,5 +5,4 @@ This library is used with the FUnicorn irreverent educational desk gadget by Alp
 Check it out at: https://www.alpenglowindustries.com/funicorn
 Or visit us at: www.alpenglowindustries.com
 
-This library was written in standard C, so it might look at little intimidating if you've only worked in Arduino C.  Do not fear, the unicorn does not bite!  There are many shortcut definitions already set up for you to use, look at FUnicorn.h for more details.  There are also functions for example blinking patterns, we encourage you to take them as a starting point and write your own!
-
+This library was written in standard C, so it might look at little intimidating if you've only worked in Arduino C.  Do not fear, the unicorn does not bite!  There are many shortcut definitions already set up for you to use, and there are lots of comments to help you equate the register writes with arduino functions.  Check out src/FUnicorn.h for more details.  There are also functions for example blinking patterns in src/FUnicorn.cpp, we encourage you to take them as a starting point and write your own!

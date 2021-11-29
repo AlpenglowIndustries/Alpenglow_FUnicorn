@@ -16,6 +16,8 @@
 
   Check out the ATMEGA328P datasheet!  It tells you everything about the registers and how they're set
   and used.  https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf
+  Also check out iom328p.h for the Atmel-provided shortcuts/macros.  You can usually find it in:
+  C:\Program Files (x86)\Arduino\hardware\tools\avr\avr\include\avr\iom328p.h
 
   Copyright 2018-2021, by Carrie Sundra for Alpenglow Industries
   All rights reserved.
@@ -38,6 +40,13 @@
 FUnicorn::FUnicorn() {}
 
 // sets all LEDs as outputs and OFF
+// changes register values with bit-shifting
+// (1 << MACRO)  shifts the number 00000001 by the number of positions of MACRO (defined in FUnicorn.h)
+// Funicorn.h uses macros already defined in Atmel/Microchip headers included with Arduino, see above for links
+// ex: (1 << FUCK) = (1 << PORTD3) = (1 << 3) = (00000001 << 3) = 00001000
+//   DDRB |= (1 << FUCK); is shorthand for DDRB = DDRB | (00001000);
+//   "OR"ing sets the bit in the FUCK position of the DDRB register to 1 without changing any other bits
+//   "AND NOT"ing clears a bit (sets it to 0).  Ex: DDRB &= ~(1 << FUCK);
 void FUnicorn::initOutputs() {
   // sets D0-D13 output values to zero
   PORTB = 0;
@@ -62,6 +71,8 @@ void FUnicorn::initButt() {
 
 // initializes PWM outputs on HORN and FUCK
 void FUnicorn::initFuckHornTimer() {
+  TCCR2A = 0;                 // clears arduino setup so we can set up PWM module ourselves
+  TCCR2B = 0;
   TCCR2A |= (1 << COM2A1) | (1 << COM2B1) | (1 << WGM20);   // Phase correct PWM, 0xFF is top, 8-bit
   OCR2A = 0;                  // should start as solid off
   OCR2B = 0;
@@ -70,6 +81,8 @@ void FUnicorn::initFuckHornTimer() {
 
 // initializes PWM outputs on BANG and YOU
 void FUnicorn::initBangYouTimer() {
+  TCCR1A = 0;                 // clears arduino setup so we can set up PWM module ourselves
+  TCCR1B = 0;
   TCCR1A |= (1 << COM1A1) | (1 << COM1B1) | (1 << WGM10);   // Phase correct PWM, 0x00FF is top, 8-bit
   ATOMIC_BLOCK(ATOMIC_FORCEON){       // atomic operation for 16-bit register writes
     OCR1A = 0;                        // should start as solid off
@@ -103,20 +116,22 @@ void FUnicorn::sleep() {
 // saves the status of different modules: analog comparator, adc, timers and watchdog
 // then sets all main registers to 0 which disables them
   uint8_t acsr_status = ACSR;
-  ACSR = 0;
+  ACSR = 0;    // turns off analog comparator
   uint8_t adcsra_status = ADCSRA;
-  ADCSRA = 0;
+  ADCSRA = 0;  // turns off ADC
   uint8_t timer0_status = TCCR0B;
   uint8_t timer1_status = TCCR1B;
   uint8_t timer2_status = TCCR2B;
-  TCCR0B = 0;
+  TCCR0B = 0;  // turns off timers
   TCCR1B = 0;
   TCCR2B = 0;
   uint8_t watchdog_status = WDTCSR;
-  WDTCSR = 0;
+  WDTCSR = 0;  // turns off watchdog
 
 // Power Reduction Register
 // powers down individual modules
+// might not be needed since sleep mode is power down mode
+
   //  PRR |= ((1 << PRTIM0) | (1 << PRTIM1) | (1 << PRTIM2) | (1 << PRADC) | (1 << PRTWI) | (1 << PRSPI) | (1 << PRUSART0));
   PRR |= ((1 << PRTIM0) | (1 << PRTIM1) | (1 << PRTIM2) | (1 << PRADC) | (1 << PRTWI) | (1 << PRSPI));
   set_sleep_mode(SLEEP_MODE_PWR_DOWN);
@@ -133,7 +148,7 @@ void FUnicorn::sleep() {
   //  PRR &= ~((1 << PRTIM0) | (1 << PRTIM1) | (1 << PRTIM2) | (1 << PRADC) | (1 << PRTWI) | (1 << PRSPI) | (1 << PRUSART0));
   PRR &= ~((1 << PRTIM0) | (1 << PRTIM1) | (1 << PRTIM2) | (1 << PRADC) | (1 << PRTWI) | (1 << PRSPI));
 
-// sets all modules to their previously saved statuses
+// sets all modules to their previously saved statuses, enables things that were enabled
   TCCR2B = timer2_status;
   TCCR1B = timer1_status;
   TCCR0B = timer0_status;
