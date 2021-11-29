@@ -104,11 +104,11 @@ void FUnicorn::init() {
 
 ///////////////////////////////////////////////////
 // Sleep Handling
-// - shuts down timers
-// - default sleep mode is idle, necessary for an edge-based interrupt
+// - saves current state of modules and shuts them down
+// - sets sleep mode to power down, external interrupts still will wake
 // - sets the sleep enable bit and puts the CPU to sleep
 // - wakes up (from a button press)
-// - enables the timers, initializes outputs again
+// - enables the modules, initializes outputs again
 ///////////////////////////////////////////////////
 
 void FUnicorn::sleep() {
