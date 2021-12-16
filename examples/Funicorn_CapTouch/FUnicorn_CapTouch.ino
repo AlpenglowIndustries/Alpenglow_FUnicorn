@@ -27,6 +27,7 @@ void setup() {
   Fun.init();                         // sets up outputs and timers
   capRef = ADCTouch.read(A0, 500);    // create reference values to account for touch offset
   Fun.hornBlink();                    // blinks horn once to indicate it's ready
+}
 
 void loop() {
 
@@ -59,4 +60,5 @@ void loop() {
     counter++;
     delay(10);  // slows down the loop a little, doesn't check for touches as often
   }
+  
 }

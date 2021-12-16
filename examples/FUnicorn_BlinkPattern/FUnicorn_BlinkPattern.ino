@@ -82,7 +82,7 @@ uint8_t checkButt() {
 // Performs a blink pattern depending on number passed in as cntr
 // Details for each in FUnicorn.cpp
 void executeBlink (uint16_t cntr) {
-  switch (cntr % 2) {    // cycles through 5 patterns
+  switch (cntr % 2) {    // cycles through first 2 of the below patterns
     case 0:
     myBlink();
     break;
@@ -115,7 +115,7 @@ void myBlink () {
   YOU_OFF;
   BANG_OFF;
 
-  unit8_t i, j;
+  uint8_t i, j;
   for (i = 0; i < 2; i++) {
     for (j = 0; j < 255; j++) {
       FUCK_PWM = j;
