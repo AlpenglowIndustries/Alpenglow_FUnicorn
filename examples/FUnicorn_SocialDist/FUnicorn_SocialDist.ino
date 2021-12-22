@@ -35,50 +35,49 @@ It continuously powers and polls the ultrasonic sensor, best
 
 #define SIXFEET 72  // a 6-ft distqnce reading on the sensor
 
-FUnicorn Fun;  // sets up an FUnicorn "object", allowing you to use functions in FUnicorn.cpp
+FUnicorn Fun;  // sets up an FUnicorn "object", allowing you to use functions in
+               // FUnicorn.cpp
 
 Ultrasonic ultrasonic(12, 13);  // (trig, echo)
 
 void setup() {
+    // sets up the unicorn
+    Fun.init();
 
-  // sets up the unicorn
-  Fun.init();
+    // pulses the horn LED once to show that it's on or freshly reset
+    Fun.hornBlink();
 
-  // pulses the horn LED once to show that it's on or freshly reset
-  Fun.hornBlink();
-
-//  Serial.begin(9600);  // useful for debugging, determining distance setting
-
+    //  Serial.begin(9600);  // useful for debugging, determining distance
+    //  setting
 }
 
 void loop() {
-
     static uint16_t counter = 0;
-    int distance =  ultrasonic.read(INC);
-//    Serial.print("distance = ");
-//    Serial.println(distance);
+    int distance = ultrasonic.read(INC);
+    //    Serial.print("distance = ");
+    //    Serial.println(distance);
 
     // if distance is not zero and under six feet, blink pattern executes
     if (distance && distance < SIXFEET) {
-      switch (counter % 5) {    // cycles through 5 patterns
-        case 0:
-        Fun.blinkDemo();
-        break;
-        case 1:
-        Fun.blinkCrazy();
-        break;
-        case 2:
-        Fun.FuckYouFuckFuckYou();
-        break;
-        case 3:
-        Fun.blinkFuckYou2X();
-        break;
-        case 4:
-        Fun.blinkAllOn();
-        break;
-      }
-      counter++;
-      delay(10);
+        switch (counter % 5) {  // cycles through 5 patterns
+            case 0:
+                Fun.blinkDemo();
+                break;
+            case 1:
+                Fun.blinkCrazy();
+                break;
+            case 2:
+                Fun.FuckYouFuckFuckYou();
+                break;
+            case 3:
+                Fun.blinkFuckYou2X();
+                break;
+            case 4:
+                Fun.blinkAllOn();
+                break;
+        }
+        counter++;
+        delay(10);
     }
-    delay(100); // slows down loop to checking a max of 10 times per second
+    delay(100);  // slows down loop to checking a max of 10 times per second
 }
